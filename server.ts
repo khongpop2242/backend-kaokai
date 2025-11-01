@@ -1488,10 +1488,13 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     // Create reset URL
     const resetUrl = `${req.headers.origin || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
 
-    // Send email using built-in Node.js modules
-    await sendPasswordResetEmail(email, user.name, resetUrl);
-
+    // Send response immediately
     res.json({ message: 'หากอีเมลนี้มีอยู่ในระบบ เราจะส่งลิงก์รีเซ็ตรหัสผ่านให้' });
+
+    // Send email in background (don't wait for it)
+    sendPasswordResetEmail(email, user.name, resetUrl).catch(err => {
+      console.error('Background email sending failed:', err);
+    });
   } catch (e: any) {
     console.error('Forgot password error:', e);
     res.status(500).json({ message: 'เกิดข้อผิดพลาด' });
