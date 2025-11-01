@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -14,11 +15,15 @@ async function main() {
   await prisma.promotion.deleteMany();
   await prisma.contact.deleteMany();
 
+  // Hash password
+  const hashedPassword = await bcrypt.hash('password123', 10);
+
   // สร้างผู้ใช้
   const user = await prisma.user.create({
     data: {
       name: 'สมชาย ใจดี',
       email: 'somchai@example.com',
+      password: hashedPassword,
       phone: '081-234-5678',
       address: '123 ถนนสุขุมวิท แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110',
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150'
